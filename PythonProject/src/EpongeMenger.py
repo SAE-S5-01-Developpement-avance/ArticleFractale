@@ -11,7 +11,7 @@ class MengerSponge:
     """
 
     WIDTH_HEIGHT = 750
-    ANGLE = 45
+    ANGLE = 90
     LENGTH = 10
 
     def __init__(self, iterations : int) -> None:
@@ -31,7 +31,7 @@ class MengerSponge:
         Returns: The resulting string after applying the rules.
         """
         if ch == 'F':
-            return 'F+F-F-F-G+F+F+F-F'
+            return 'F+F-F-F-UGD+F+F+F-F'
         if ch == 'G':
             return 'GGG'
         return ch
@@ -69,21 +69,20 @@ class MengerSponge:
         length : The length of each side of the sponge.
         """
         turtle.speed(0)
-        turtle.up()
-        turtle.goto(-self.WIDTH_HEIGHT / 2, self.WIDTH_HEIGHT / 2)
-        turtle.down()
         for ch in s:
             match ch:
                 case 'F':
                     turtle.forward(length)
                 case 'G':
-                    turtle.up()
                     turtle.forward(length)
+                case 'U':
+                    turtle.up()
+                case 'D':
                     turtle.down()
                 case '+':
-                    turtle.right(90)
+                    turtle.right(self.ANGLE)
                 case '-':
-                    turtle.left(90)
+                    turtle.left(self.ANGLE)
         turtle.done()
 
     def draw_iteration_number(self):
@@ -101,11 +100,11 @@ class MengerSponge:
         """
         self.draw_iteration_number()
         turtle.up()
-        turtle.goto(-self.WIDTH_HEIGHT / 4, -self.WIDTH_HEIGHT / 4)
+        turtle.goto(-self.WIDTH_HEIGHT / 4, 0)
         turtle.down()
-        turtle.pensize(3)
+        turtle.pensize(2)
         s = self.compute_fractal()
-        self.draw_fractal(s, 30)
+        self.draw_fractal(s, 15)
 
     def show_final_fractal(self):
         """
@@ -115,17 +114,17 @@ class MengerSponge:
         turtle.hideturtle()
         turtle.tracer(0, 0)
         turtle.up()
-        turtle.goto(-self.WIDTH_HEIGHT / 1.7, -self.WIDTH_HEIGHT / 2)
+        turtle.goto(-self.WIDTH_HEIGHT / 1.6, 0)
         turtle.down()
         turtle.pensize(1)
         s = self.compute_fractal()
-        self.draw_fractal(s, 7)
+        self.draw_fractal(s, 3)
         turtle.update()
         turtle.showturtle()
 
 if __name__ == '__main__':
-    mengerSpongeSmall = MengerSponge(2)
-    # mengerSpongeSmall.show_fractal_generation()
+    mengerSpongeSmall = MengerSponge(3)
+    #mengerSpongeSmall.show_fractal_generation()
 
-    mengerSpongeLarge = MengerSponge(3)
+    mengerSpongeLarge = MengerSponge(5)
     mengerSpongeLarge.show_final_fractal()
