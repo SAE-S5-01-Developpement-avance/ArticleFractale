@@ -1,5 +1,5 @@
 import matplotlib
-matplotlib.use('TkAgg')  # Set the backend to TkAgg
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -37,4 +37,4 @@ plt.colorbar(label='Nombre d\'itérations')
 plt.title("Ensemble de Mandelbrot")
 plt.xlabel("Re(z)")
 plt.ylabel("Im(z)")
-plt.show()
+plt.savefig('mandelbrot.png')
