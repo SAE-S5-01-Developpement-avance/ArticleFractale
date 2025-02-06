@@ -1,130 +1,76 @@
-import turtle
-import math
+from itertools import product
+import matplotlib.pyplot as plt
+import numpy as np
 
-class MengerSponge:
+
+def create_menger_sponge(order):
     """
-    A class to represent a Menger Sponge fractal.
-
-    WIDTH_HEIGHT :  The width and height of the drawing area.
-    ANGLE :         The angle used for turning the turtle.
-    LENGTH :        The length of each side of the sponge.
+    Generate a Menger sponge of given order.
+    Returns a 3D numpy array where True represents solid cubes and False represents empty space.
     """
+    size = 3 ** order  # The sponge has dimensions (3^order) x (3^order) x (3^order)
+    sponge = np.ones((size, size, size), dtype=bool)  # Initialize a 3D array with all cubes present
 
-    WIDTH_HEIGHT = 750
-    ANGLE = 90
-    LENGTH = 10
-
-    def __init__(self, iterations : int) -> None:
+    def should_remove(x, y, z):
         """
-        Initializes the SierpinskiTriangle with the number of iterations.
-
-        iterations : The number of iterations to generate the fractal.
+        Determines if a cube at position (x, y, z) should be removed.
+        A cube should be removed if it is in the center of a 3x3x3 block.
         """
-        self.iterations = iterations
+        while x > 0 or y > 0 or z > 0:
+            # Check if the cube is in the middle of any face
+            if (x % 3 == 1 and y % 3 == 1) or \
+                    (y % 3 == 1 and z % 3 == 1) or \
+                    (z % 3 == 1 and x % 3 == 1):
+                return True  # The cube should be removed
+            x //= 3  # Move to the next larger cube level
+            y //= 3
+            z //= 3
+        return False  # The cube remains
 
-    def apply_rules(self, ch: str) -> str:
-        """
-        Applies the L-system rules to a character.
+    # Iterate through each position in the 3D grid
+    for x in range(size):
+        for y in range(size):
+            for z in range(size):
+                if should_remove(x, y, z):
+                    sponge[x, y, z] = False  # Mark the cube as removed
 
-        ch : The character to apply the rules to.
+    return sponge
 
-        Returns: The resulting string after applying the rules.
-        """
-        if ch == 'F':
-            return 'F+F-F-F-UGD+F+F+F-F'
-        if ch == 'G':
-            return 'GGG'
-        return ch
 
-    def process_string(self, s: str) -> str:
-        """
-        Processes a string by applying the L-system rules to each character.
+def plot_menger_sponge_3d(sponge):
+    """
+    Create a 3D visualization of the Menger sponge using Matplotlib.
 
-        s : The string to process.
+    Args:
+        sponge (numpy.ndarray): 3D array representing the Menger sponge
+    """
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection='3d')  # Create a 3D plot
 
-        Returns: The resulting string after processing.
-        """
-        new_str = ''
-        for ch in s:
-            new_str += self.apply_rules(ch)
-        return new_str
+    # Get coordinates of filled (solid) cubes
+    x, y, z = np.where(sponge)
 
-    def compute_fractal(self) -> str:
-        """
-        Computes the fractal string after the given number of iterations.
+    # Use ax.voxels to visualize the 3D Menger sponge
+    ax.voxels(sponge, facecolors='blue', edgecolors='k', alpha=0.8)
 
-        Returns: The final fractal string.
-        """
-        axiom = 'F'
-        s = axiom
-        for _ in range(self.iterations):
-            s = self.process_string(s)
-        return s
+    # Set equal aspect ratio for proper visualization
+    ax.set_box_aspect([1, 1, 1])
 
-    def draw_fractal(self, s: str, length: int):
-        """
-        Draws the fractal using the turtle graphics module.
+    # Label axes
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
 
-        s : The fractal string to draw.
-        length : The length of each side of the sponge.
-        """
-        turtle.speed(0)
-        for ch in s:
-            match ch:
-                case 'F':
-                    turtle.forward(length)
-                case 'G':
-                    turtle.forward(length)
-                case 'U':
-                    turtle.up()
-                case 'D':
-                    turtle.down()
-                case '+':
-                    turtle.right(self.ANGLE)
-                case '-':
-                    turtle.left(self.ANGLE)
-        turtle.done()
+    # Set plot title with the order of the sponge
+    plt.title(f'Menger Sponge (Order {int(np.log(len(sponge)) / np.log(3))})')
 
-    def draw_iteration_number(self):
-        """
-        Draws the number of iterations on the screen.
-        """
-        turtle.up()
-        turtle.goto(-self.WIDTH_HEIGHT / 2, self.WIDTH_HEIGHT / 2)
-        turtle.down()
-        turtle.write("ITERATIONS : " + str(self.iterations), align="center", font=("Times", 16, "normal"))
+    return fig, ax
 
-    def show_fractal_generation(self):
-        """
-        Shows the fractal generation process.
-        """
-        self.draw_iteration_number()
-        turtle.up()
-        turtle.goto(-self.WIDTH_HEIGHT / 4, 0)
-        turtle.down()
-        turtle.pensize(2)
-        s = self.compute_fractal()
-        self.draw_fractal(s, 15)
 
-    def show_final_fractal(self):
-        """
-        Shows a final fractal bigger than the previous one.
-        """
-        self.draw_iteration_number()
-        turtle.hideturtle()
-        turtle.tracer(0, 0)
-        turtle.up()
-        turtle.goto(-self.WIDTH_HEIGHT / 1.6, 0)
-        turtle.down()
-        turtle.pensize(1)
-        s = self.compute_fractal()
-        self.draw_fractal(s, 3)
-        turtle.update()
-        turtle.showturtle()
-
-if __name__ == '__main__':
-    mengerSpongeSmall = MengerSponge(3)
-    #mengerSpongeSmall.show_fractal_generation()
-
-    mengerSpongeLarge = MengerSponge(5)
-    mengerSpongeLarge.show_final_fractal()
+if __name__ == "__main__":
+    # Generate and visualize Menger sponges for orders 0, 1, and 2
+    for order in range(3):
+        print(f"Creating Menger Sponge of Order {order}...")
+        sponge = create_menger_sponge(order)  # Generate the sponge
+        fig, ax = plot_menger_sponge_3d(sponge)  # Plot the sponge
+        plt.show()  # Display the 3D plot
