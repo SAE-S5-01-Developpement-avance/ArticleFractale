@@ -1,7 +1,7 @@
 import turtle
-import math
 
-class MengerSponge:
+
+class SierpinskiCarpet:
     """
     A class to represent a Menger Sponge fractal.
 
@@ -123,8 +123,8 @@ class MengerSponge:
         turtle.showturtle()
 
 if __name__ == '__main__':
-    mengerSpongeSmall = MengerSponge(3)
-    #mengerSpongeSmall.show_fractal_generation()
+    sierpinskiCarpetSmall = SierpinskiCarpet(3)
+    #sierpinskiCarpetSmall.show_fractal_generation()
 
-    mengerSpongeLarge = MengerSponge(5)
-    mengerSpongeLarge.show_final_fractal()
+    sierpinskiCarpetLarge = SierpinskiCarpet(5)
+    sierpinskiCarpetLarge.show_final_fractal()
